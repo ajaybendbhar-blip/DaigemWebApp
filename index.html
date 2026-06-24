@@ -13,19 +13,41 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
+    integrity="sha512-H2Ih0CS4e5wT7JfKSq9MVfT+tKZ30PbZQvx5FsS8ugI6eMI4V+M1JZj9hJZ7QE6RH+287dYVkcKqG3lSzi1i9A=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
 
   <style>
     body {
-      background-color: #f4f6fb;
+      background: radial-gradient(circle at top left, #e8f3ff 0, #f4f6fb 40%, #f4f6fb 100%);
       font-size: 0.95rem;
     }
     .app-shell {
       max-width: 1100px;
     }
+    .app-header-card {
+      border-radius: 14px;
+      border: 1px solid #d6e4ff;
+      background: linear-gradient(135deg, #0d6efd 0, #0b5ed7 40%, #0a58ca 100%);
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(13, 110, 253, 0.25);
+    }
+    .app-header-card h4 {
+      margin-bottom: 0.25rem;
+    }
+    .app-header-card p {
+      opacity: 0.9;
+    }
     .card {
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #e3e6f0;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+      background-color: #ffffff;
     }
     .card-header {
       background-color: #ffffff;
@@ -33,7 +55,7 @@
       padding: 0.6rem 1rem;
     }
     .card-body {
-      padding: 0.75rem 1rem 1rem;
+      padding: 0.8rem 1rem 1rem;
     }
     .step-label {
       font-size: 0.75rem;
@@ -41,10 +63,38 @@
       letter-spacing: 0.08em;
       color: #6c757d;
     }
+    .metric-tile {
+      border-radius: 10px;
+      padding: 0.55rem 0.75rem;
+      background-color: #f8f9fc;
+      border: 1px solid #e3e6f0;
+      margin-bottom: 0.5rem;
+    }
+    .metric-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6c757d;
+    }
+    .metric-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
     .badge-club {
       font-size: 0.85rem;
-      padding: 0.3rem 0.6rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
     }
+    .badge-mdcouncil { background-color: #0d6efd; }
+    .badge-diamond   { background-color: #20c997; }
+    .badge-emerald   { background-color: #198754; }
+    .badge-ruby      { background-color: #dc3545; }
+    .badge-others    { background-color: #6c757d; }
+
+    .table-sm th, .table-sm td {
+      padding: 0.4rem 0.5rem;
+    }
+
     @media (max-width: 576px) {
       body {
         font-size: 0.9rem;
@@ -69,20 +119,28 @@
 
 <body>
   <div class="container py-3 app-shell">
-    <!-- Header -->
-    <header class="mb-3">
-      <h4 class="fw-semibold mb-1">DIAGEM Loyalty Simulator</h4>
-      <p class="text-muted mb-0">
-        Project club status, DIAGEM bonus, and recognition based on projected annual performance.
-      </p>
-    </header>
+    <!-- App header -->
+    <section class="app-header-card text-white mb-3">
+      <div class="row g-0 align-items-center">
+        <div class="col-3 col-md-2 text-center py-3">
+          <i class="bi bi-trophy-fill" style="font-size: 2.4rem;"></i>
+        </div>
+        <div class="col-9 col-md-10 py-3">
+          <h4 class="fw-semibold mb-1">DIAGEM Loyalty Simulator</h4>
+          <p class="mb-1">
+            Evaluate channel partners on DIAGEM parameters, project club status, and estimate bonus & recognition.
+          </p>
+          <small class="opacity-75">Use Branch → Dealer → Inputs → Simulation flow below.</small>
+        </div>
+      </div>
+    </section>
 
     <!-- Step 1: Branch selection -->
     <section class="card mb-3">
       <div class="card-header d-flex justify-content-between align-items-center">
         <div>
           <div class="step-label">Step 1</div>
-          <div>Select Branch</div>
+          <div><i class="bi bi-building me-1"></i>Select Branch</div>
         </div>
         <small id="globalStatus" class="text-muted"></small>
       </div>
@@ -102,7 +160,7 @@
     <section class="card mb-3">
       <div class="card-header">
         <div class="step-label">Step 2</div>
-        <div>Select Dealer within Branch</div>
+        <div><i class="bi bi-person-badge me-1"></i>Select Dealer within Branch</div>
       </div>
       <div class="card-body">
         <div class="row g-2">
@@ -132,7 +190,7 @@
     <section class="card mb-3">
       <div class="card-header">
         <div class="step-label">Snapshot</div>
-        <div>Dealer Details (from Master)</div>
+        <div><i class="bi bi-card-list me-1"></i>Dealer Details (from Master)</div>
       </div>
       <div class="card-body" id="dealerSnapshot">
         <p class="text-muted mb-0">Select branch & dealer, then click "Fetch Dealer" to view master details.</p>
@@ -143,7 +201,7 @@
     <section class="card mb-3">
       <div class="card-header">
         <div class="step-label">Step 3</div>
-        <div>Enter Simulation Inputs</div>
+        <div><i class="bi bi-sliders me-1"></i>Enter Simulation Inputs</div>
       </div>
       <div class="card-body">
         <div class="row g-2">
@@ -197,30 +255,37 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <div>
           <div class="step-label">Output</div>
-          <div>Simulation Result</div>
+          <div><i class="bi bi-graph-up-arrow me-1"></i>Simulation Result</div>
         </div>
-        <button class="btn btn-sm btn-outline-primary" onclick="saveSimulation()">Save Simulation</button>
+        <button class="btn btn-sm btn-outline-primary" onclick="saveSimulation()">
+          <i class="bi bi-save me-1"></i>Save Simulation
+        </button>
       </div>
       <div class="card-body">
         <div id="summaryPanel" class="mb-3"></div>
-        <div class="table-responsive">
-          <table class="table table-sm table-bordered align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Parameter</th>
-                <th>Weight</th>
-                <th>Actual Value</th>
-                <th>Rating</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody id="parameterTableBody"></tbody>
-          </table>
-        </div>
+        <details>
+          <summary class="small text-primary" style="cursor:pointer;">
+            Show parameter-wise breakdown
+          </summary>
+          <div class="table-responsive mt-2">
+            <table class="table table-sm table-bordered align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Parameter</th>
+                  <th>Weight</th>
+                  <th>Actual Value</th>
+                  <th>Rating</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody id="parameterTableBody"></tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </section>
 
-    <footer class="mt-3 text-center text-muted small">
+    <footer class="mt-2 text-center text-muted small">
       DIAGEM simulation | For internal use with Daikin channel partners
     </footer>
   </div>
@@ -464,24 +529,61 @@
       const bonusPct = result.bonusPercent || 0;
       const recogPct = result.recognitionPercent || 0;
 
+      const club = (result.clubName || '').toLowerCase();
+      let badgeClass = 'badge-others';
+      if (club.includes('md')) badgeClass = 'badge-mdcouncil';
+      else if (club.includes('diamond')) badgeClass = 'badge-diamond';
+      else if (club.includes('emerald')) badgeClass = 'badge-emerald';
+      else if (club.includes('ruby')) badgeClass = 'badge-ruby';
+
       summaryDiv.innerHTML = `
-        <div class="row mb-2 align-items-center">
-          <div class="col-md-3">
-            <strong>Total Points:</strong> ${result.totalPoints.toFixed(2)}
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-md-4">
+            <div class="metric-tile">
+              <div class="metric-label">Total Points</div>
+              <div class="metric-value">${result.totalPoints.toFixed(2)}</div>
+            </div>
           </div>
-          <div class="col-md-3">
-            <strong>Club:</strong>
-            <span class="badge bg-primary badge-club">${result.clubName}</span>
+          <div class="col-12 col-md-4">
+            <div class="metric-tile">
+              <div class="metric-label">Club</div>
+              <div class="metric-value">
+                <span class="badge text-white ${badgeClass}">${result.clubName}</span>
+              </div>
+            </div>
           </div>
-          <div class="col-md-3">
-            <strong>Total CY Turnover (Mn):</strong> ${result.totalCyTurnover.toFixed(2)}
+          <div class="col-12 col-md-4">
+            <div class="metric-tile">
+              <div class="metric-label">Total CY Turnover (Mn)</div>
+              <div class="metric-value">${result.totalCyTurnover.toFixed(2)}</div>
+            </div>
           </div>
         </div>
-        <div class="row mb-2">
-          <div class="col-md-3"><strong>Bonus %:</strong> ${bonusPct}%</div>
-          <div class="col-md-3"><strong>Bonus Amount (Mn):</strong> ${result.bonusAmount.toFixed(2)}</div>
-          <div class="col-md-3"><strong>Recognition %:</strong> ${recogPct}%</div>
-          <div class="col-md-3"><strong>Recognition Amount (Mn):</strong> ${result.recognitionAmount.toFixed(2)}</div>
+        <div class="row g-2">
+          <div class="col-6 col-md-3">
+            <div class="metric-tile">
+              <div class="metric-label">Bonus %</div>
+              <div class="metric-value">${bonusPct}%</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-tile">
+              <div class="metric-label">Bonus Amount (Mn)</div>
+              <div class="metric-value">${result.bonusAmount.toFixed(2)}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-tile">
+              <div class="metric-label">Recognition %</div>
+              <div class="metric-value">${recogPct}%</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-tile">
+              <div class="metric-label">Recognition Amount (Mn)</div>
+              <div class="metric-value">${result.recognitionAmount.toFixed(2)}</div>
+            </div>
+          </div>
         </div>
       `;
 
