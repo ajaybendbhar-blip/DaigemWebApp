@@ -9,7 +9,6 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
-    integrity="sha512-Tbd1nA1N0Rr3BqgQ3RDf+JxKOB8yDw8nYFSl6yHQa1rE0X7xt+6CxoX0nrV8It3SXZb+H1pIlLb8g1JQ5rKfug=="
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
@@ -17,104 +16,123 @@
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css"
-    integrity="sha512-H2Ih0CS4e5wT7JfKSq9MVfT+tKZ30PbZQvx5FsS8ugI6eMI4V+M1JZj9hJZ7QE6RH+287dYVkcKqG3lSzi1i9A=="
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
 
   <style>
     body {
-      background-color: #f5f5f7;
-      font-size: 0.95rem;
+      background-color: #f1f5f9;
+      font-size: 1rem;
     }
     .app-shell {
       max-width: 960px;
     }
     .top-bar {
-      background-color: #0d6efd;
-      color: #fff;
+      background: linear-gradient(90deg, #0f172a, #0ea5e9);
+      color: #f9fafb;
     }
     .top-bar .title {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: 600;
     }
     .top-bar .subtitle {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       opacity: 0.9;
     }
-    .card {
-      border-radius: 10px;
-      border: 1px solid #e2e3e7;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      background-color: #ffffff;
+
+    .section-header {
+      margin-top: 0.75rem;
+      margin-bottom: 0.5rem;
     }
-    .card-header {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e2e3e7;
-      padding: 0.55rem 0.9rem;
-    }
-    .card-body {
-      padding: 0.8rem 0.9rem 0.9rem;
-    }
-    .step-title {
-      font-size: 0.9rem;
+    .section-title {
+      font-size: 1.1rem;
       font-weight: 600;
     }
-    .step-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #6c757d;
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: #6b7280;
     }
+
+    .card {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      background-color: #ffffff;
+      margin-bottom: 1.25rem;
+    }
+    .card-body {
+      padding: 1.15rem 1.25rem 1.25rem;
+    }
+
+    .card-dealer   { border-top: 4px solid #0ea5e9; }
+    .card-inputs   { border-top: 4px solid #22c55e; }
+    .card-results  { border-top: 4px solid #f97316; }
+
+    .pill-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #6b7280;
+      margin-bottom: 0.3rem;
+    }
+
     .metric-tile {
-      border-radius: 8px;
-      padding: 0.5rem 0.7rem;
-      background-color: #f8f9fb;
-      border: 1px solid #e2e3e7;
-      margin-bottom: 0.4rem;
+      border-radius: 10px;
+      padding: 0.7rem 0.8rem;
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 0.6rem;
     }
     .metric-label {
-      font-size: 0.75rem;
-      color: #6c757d;
+      font-size: 0.8rem;
+      color: #6b7280;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      margin-bottom: 0.15rem;
     }
     .metric-value {
-      font-size: 1.0rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
     .badge-club {
-      font-size: 0.8rem;
-      padding: 0.25rem 0.6rem;
+      font-size: 0.9rem;
+      padding: 0.3rem 0.7rem;
       border-radius: 999px;
     }
     .badge-mdcouncil { background-color: #0d6efd; }
-    .badge-diamond   { background-color: #20c997; }
-    .badge-emerald   { background-color: #198754; }
-    .badge-ruby      { background-color: #dc3545; }
-    .badge-others    { background-color: #6c757d; }
+    .badge-diamond   { background-color: #0ea5e9; }
+    .badge-emerald   { background-color: #16a34a; }
+    .badge-ruby      { background-color: #dc2626; }
+    .badge-others    { background-color: #6b7280; }
 
     .table-sm th, .table-sm td {
-      padding: 0.35rem 0.45rem;
+      padding: 0.45rem 0.55rem;
+      font-size: 0.9rem;
+    }
+
+    label.form-label {
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     @media (max-width: 576px) {
       body {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
       }
       .card-body {
-        padding: 0.75rem;
+        padding: 1rem;
       }
       .btn {
         width: 100%;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
       }
       .btn + .btn {
         margin-left: 0 !important;
       }
       .app-shell {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
       }
       .top-bar .subtitle {
         display: none;
@@ -124,95 +142,94 @@
 </head>
 
 <body>
-  <!-- Simple top bar -->
+  <!-- Top bar -->
   <nav class="navbar top-bar mb-3">
-    <div class="container app-shell d-flex flex-column flex-sm-row align-items-sm-center">
-      <span class="title me-sm-3">DIAGEM Loyalty Simulator</span>
-      <span class="subtitle">Branch → Dealer → Inputs → Simulation</span>
-      <span id="globalStatus" class="ms-sm-auto small"></span>
+    <div class="container app-shell d-flex flex-column flex-sm-row align-items-sm-center py-2">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-trophy-fill me-2" style="font-size: 1.4rem;"></i>
+        <div>
+          <div class="title">DIAGEM Loyalty Simulator</div>
+          <div class="subtitle">Select dealer → Enter projections → View club & payout</div>
+        </div>
+      </div>
+      <span id="globalStatus" class="ms-sm-auto mt-2 mt-sm-0 small"></span>
     </div>
   </nav>
 
-  <div class="container app-shell pb-3">
+  <div class="container app-shell pb-4">
 
-    <!-- Step 1: Branch selection -->
-    <section class="card mb-3">
-      <div class="card-header">
-        <div class="step-label">Step 1</div>
-        <div class="step-title">Select Branch</div>
-      </div>
+    <!-- SECTION 1: Dealer selection -->
+    <div class="section-header">
+      <div class="section-title">1. Dealer selection</div>
+      <div class="section-subtitle">Choose branch and dealer; master data will be pulled automatically.</div>
+    </div>
+
+    <div class="card card-dealer">
       <div class="card-body">
-        <div class="row g-2 align-items-end">
+        <div class="pill-label">Branch</div>
+        <div class="row g-3 mb-3">
           <div class="col-12 col-md-4">
             <label class="form-label mb-1">Branch</label>
-            <select id="branchSelect" class="form-select form-select-sm" onchange="onBranchChange()">
+            <select id="branchSelect" class="form-select form-select-md" onchange="onBranchChange()">
               <option value="">Loading branches...</option>
             </select>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Step 2: Dealer selection -->
-    <section class="card mb-3">
-      <div class="card-header">
-        <div class="step-label">Step 2</div>
-        <div class="step-title">Select Dealer</div>
-      </div>
-      <div class="card-body">
-        <div class="row g-2">
+        <div class="pill-label">Dealer</div>
+        <div class="row g-3 mb-3">
           <div class="col-12 col-md-4">
             <label class="form-label mb-1">Dealer Code</label>
-            <input id="dealerCodeInput" type="text" class="form-control form-control-sm" placeholder="Enter dealer code">
+            <input id="dealerCodeInput" type="text" class="form-control form-control-md" placeholder="Enter dealer code">
           </div>
           <div class="col-12 col-md-4">
-            <label class="form-label mb-1">Dealer Name</label>
-            <input id="dealerNameSearch" type="text" class="form-control form-control-sm" placeholder="Type to filter" oninput="filterDealerList()">
+            <label class="form-label mb-1">Dealer Name (search)</label>
+            <input id="dealerNameSearch" type="text" class="form-control form-control-md" placeholder="Type to filter" oninput="filterDealerList()">
           </div>
           <div class="col-12 col-md-4">
             <label class="form-label mb-1">Dealer list</label>
-            <select id="dealerList" class="form-select form-select-sm" onchange="onDealerSelectedFromList()">
+            <select id="dealerList" class="form-select form-select-md" onchange="onDealerSelectedFromList()">
               <option value="">-- Select Dealer --</option>
             </select>
           </div>
         </div>
-        <div class="mt-2 d-flex flex-column flex-md-row align-items-md-center">
-          <button class="btn btn-primary btn-sm" onclick="fetchDealer()">Fetch Dealer</button>
-          <span id="dealerFetchStatus" class="ms-md-3 mt-2 mt-md-0 text-muted small"></span>
+
+        <div class="d-flex flex-column flex-md-row align-items-md-center">
+          <button class="btn btn-primary me-md-2" onclick="fetchDealer()">
+            <i class="bi bi-search me-1"></i>Fetch Dealer
+          </button>
+          <span id="dealerFetchStatus" class="mt-2 mt-md-0 text-muted small"></span>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="pill-label mb-2">Dealer snapshot</div>
+        <div id="dealerSnapshot">
+          <p class="text-muted mb-0">After selecting branch and dealer, click “Fetch Dealer” to view details.</p>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Dealer details -->
-    <section class="card mb-3">
-      <div class="card-header">
-        <div class="step-label">Snapshot</div>
-        <div class="step-title">Dealer Details</div>
-      </div>
-      <div class="card-body" id="dealerSnapshot">
-        <p class="text-muted mb-0">Select branch & dealer, then click "Fetch Dealer" to view details.</p>
-      </div>
-    </section>
+    <!-- SECTION 2: Simulation inputs -->
+    <div class="section-header">
+      <div class="section-title">2. Simulation inputs</div>
+      <div class="section-subtitle">Enter projected CY sales/service and qualitative parameters.</div>
+    </div>
 
-    <!-- Step 3: Simulation Inputs -->
-    <section class="card mb-3">
-      <div class="card-header">
-        <div class="step-label">Step 3</div>
-        <div class="step-title">Simulation Inputs</div>
-      </div>
+    <div class="card card-inputs">
       <div class="card-body">
-        <div class="row g-2">
+        <div class="row g-3 mb-3">
           <div class="col-12 col-md-3">
             <label class="form-label mb-1">CY Sales (Mn)</label>
-            <input id="cySalesInput" type="number" step="0.01" class="form-control form-control-sm" placeholder="e.g. 120">
+            <input id="cySalesInput" type="number" step="0.01" class="form-control form-control-md" placeholder="e.g. 120">
           </div>
           <div class="col-12 col-md-3">
             <label class="form-label mb-1">CY Service (Mn)</label>
-            <input id="cyServiceInput" type="number" step="0.01" class="form-control form-control-sm" placeholder="e.g. 10">
+            <input id="cyServiceInput" type="number" step="0.01" class="form-control form-control-md" placeholder="e.g. 10">
           </div>
           <div class="col-6 col-md-3">
             <label class="form-label mb-1">City Category</label>
-            <select id="cityCategoryInput" class="form-select form-select-sm">
+            <select id="cityCategoryInput" class="form-select form-select-md">
               <option value="A">A</option>
               <option value="B">B</option>
               <option value="C">C</option>
@@ -222,47 +239,48 @@
           </div>
           <div class="col-6 col-md-3">
             <label class="form-label mb-1">Exclusivity</label>
-            <select id="exclusivityInput" class="form-select form-select-sm">
+            <select id="exclusivityInput" class="form-select form-select-md">
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
           </div>
         </div>
 
-        <div class="row g-2 mt-2">
+        <div class="row g-3 mb-3">
           <div class="col-6 col-md-3">
             <label class="form-label mb-1">Cheque Bounce (CY)</label>
-            <select id="chequeBounceInput" class="form-select form-select-sm">
+            <select id="chequeBounceInput" class="form-select form-select-md">
               <option value="No">No</option>
               <option value="Yes">Yes</option>
             </select>
           </div>
         </div>
 
-        <div class="mt-3 d-flex flex-column flex-md-row align-items-md-center">
-          <button class="btn btn-success btn-sm" onclick="runSimulation()">Run Simulation</button>
-          <button class="btn btn-outline-secondary btn-sm ms-md-2" onclick="resetInputs()">Reset</button>
+        <div class="d-flex flex-column flex-md-row align-items-md-center mt-1">
+          <button class="btn btn-success me-md-2" onclick="runSimulation()">
+            <i class="bi bi-play-fill me-1"></i>Run Simulation
+          </button>
+          <button class="btn btn-outline-secondary" onclick="resetInputs()">
+            Reset Inputs
+          </button>
           <span id="simulationStatus" class="ms-md-3 mt-2 mt-md-0 text-muted small"></span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Results -->
-    <section class="card mb-3" id="resultCard" style="display:none;">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <div>
-          <div class="step-label">Output</div>
-          <div class="step-title">Simulation Result</div>
-        </div>
-        <button class="btn btn-sm btn-outline-primary" onclick="saveSimulation()">
-          Save
-        </button>
-      </div>
+    <!-- SECTION 3: Results -->
+    <div class="section-header">
+      <div class="section-title">3. Result summary</div>
+      <div class="section-subtitle">Total DIAGEM points, club category and estimated payouts.</div>
+    </div>
+
+    <div class="card card-results" id="resultCard" style="display:none;">
       <div class="card-body">
         <div id="summaryPanel" class="mb-3"></div>
+
         <details>
           <summary class="small text-primary" style="cursor:pointer;">
-            Show parameter breakdown
+            Show parameter-wise breakdown
           </summary>
           <div class="table-responsive mt-2">
             <table class="table table-sm table-bordered align-middle">
@@ -279,16 +297,22 @@
             </table>
           </div>
         </details>
-      </div>
-    </section>
 
-    <footer class="mt-2 text-center text-muted small">
-      DIAGEM simulation | Internal use
+        <div class="mt-3 d-flex flex-column flex-md-row justify-content-md-end">
+          <button class="btn btn-outline-primary" onclick="saveSimulation()">
+            <i class="bi bi-save me-1"></i>Save Simulation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-3 text-center text-muted small">
+      DIAGEM simulation | Internal management tool
     </footer>
   </div>
 
   <script>
-    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEwpM_KU9mxKIfmefPgquipONxWcuRu0o94Un7H6V8GoIIV5d-3TNdOyLf9-woMrXIvA/exec';
+    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwiPUtk9oEa7c_e-f81YEifV-WAWoyNcpQlC8s1cggzh1nn-_NCZoSXjrRGiXsesWZxvg/exec';
 
     let branches = [];
     let dealersForBranch = [];
@@ -312,7 +336,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const status = document.getElementById('globalStatus');
-      status.textContent = 'Loading...';
+      status.textContent = 'Loading branches...';
       try {
         branches = await callApi('getBranchList');
         const sel = document.getElementById('branchSelect');
@@ -339,7 +363,7 @@
       document.getElementById('dealerNameSearch').value = '';
       document.getElementById('dealerList').innerHTML = '<option value="">-- Select Dealer --</option>';
       document.getElementById('dealerSnapshot').innerHTML =
-        '<p class="text-muted mb-0">Select branch & dealer, then click "Fetch Dealer" to view details.</p>';
+        '<p class="text-muted mb-0">After selecting branch and dealer, click “Fetch Dealer” to view details.</p>';
       document.getElementById('resultCard').style.display = 'none';
 
       if (!branch) return;
@@ -420,17 +444,17 @@
     function renderDealerSnapshot(dealer) {
       const div = document.getElementById('dealerSnapshot');
       const html = `
-        <div class="row mb-1">
+        <div class="row mb-2">
           <div class="col-md-4"><strong>Code:</strong> ${dealer.dealerCode}</div>
           <div class="col-md-4"><strong>Name:</strong> ${dealer.dealerName}</div>
           <div class="col-md-4"><strong>Branch:</strong> ${dealer.branch}</div>
         </div>
-        <div class="row mb-1">
+        <div class="row mb-2">
           <div class="col-md-4"><strong>City:</strong> ${dealer.city}</div>
           <div class="col-md-4"><strong>City Cat:</strong> ${dealer.cityCategory}</div>
           <div class="col-md-4"><strong>DOJ:</strong> ${formatDate(dealer.dateOfJoining)}</div>
         </div>
-        <div class="row mb-1">
+        <div class="row mb-2">
           <div class="col-md-4"><strong>Years:</strong> ${dealer.yearsOfAssociation}</div>
           <div class="col-md-4"><strong>LY Sales (Mn):</strong> ${dealer.lySales}</div>
           <div class="col-md-4"><strong>LY Service (Mn):</strong> ${dealer.lyService}</div>
@@ -532,7 +556,7 @@
       else if (club.includes('ruby')) badgeClass = 'badge-ruby';
 
       summaryDiv.innerHTML = `
-        <div class="row g-2 mb-2">
+        <div class="row g-3 mb-3">
           <div class="col-12 col-md-4">
             <div class="metric-tile">
               <div class="metric-label">Total Points</div>
@@ -554,7 +578,7 @@
             </div>
           </div>
         </div>
-        <div class="row g-2">
+        <div class="row g-3">
           <div class="col-6 col-md-3">
             <div class="metric-tile">
               <div class="metric-label">Bonus %</div>
