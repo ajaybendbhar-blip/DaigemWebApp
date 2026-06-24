@@ -16,30 +16,29 @@
 
   <style>
     body {
-      background-color: #f5f7fb;
+      background-color: #f4f6fb;
     }
     .app-shell {
       max-width: 1100px;
     }
     .card {
-      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
       border-radius: 10px;
-      border: 1px solid #e6e9f2;
+      border: 1px solid #e3e6f0;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
     }
     .card-header {
       background-color: #ffffff;
-      border-bottom: 1px solid #e6e9f2;
-      font-weight: 500;
+      border-bottom: 1px solid #e3e6f0;
     }
     .step-label {
-      font-size: 0.8rem;
-      letter-spacing: 0.08em;
+      font-size: 0.78rem;
       text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: #6c757d;
     }
     .badge-club {
-      font-size: 0.9rem;
-      padding: 0.4rem 0.7rem;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.6rem;
     }
   </style>
 </head>
@@ -206,7 +205,7 @@
 
   <script>
     // === CONFIG ===
-    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1tBaNF0JadAqz3gOoA6668ZoAJjEZgaBFMVsL41qo5BSI_1CGqPvgCser_s2Y1K1rBw/exec';
+    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPO3AUOAVqh1gvpi37ggxcgl1g6WqgVcEVCN_aHXJSRkKNy1m2haKRGcF2URcm_5Xy4g/exec';
 
     // === GLOBAL STATE ===
     let branches = [];
@@ -215,7 +214,7 @@
     let lastSimulationPayload = null;
     let lastSimulationResult = null;
 
-    // === API CALL HELPER (text/plain to avoid CORS preflight) ===
+    // === API CALL HELPER (text/plain to reduce CORS friction) ===
     async function callApi(action, payload = {}) {
       const body = { action, ...payload };
       const res = await fetch(APPSCRIPT_URL, {
@@ -327,9 +326,7 @@
         const dealer = await callApi('getDealerByCode', { branch, dealerCode: code });
         currentDealer = dealer;
         status.textContent = 'Loaded';
-
         renderDealerSnapshot(dealer);
-
         document.getElementById('cityCategoryInput').value = dealer.cityCategory || 'E';
         document.getElementById('exclusivityInput').value = dealer.defaultExclusivity || 'No';
         document.getElementById('chequeBounceInput').value = 'No';
