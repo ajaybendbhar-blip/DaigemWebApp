@@ -1,445 +1,530 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>DIAGEM Loyalty Simulator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+/**********************
+ * CONFIG
+ **********************/
+const SPREADSHEET_ID = '1vK2HnM8Smo3OwlNNGMhSzZVhXu92wfh0DaDONJrOgsw';
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+const SHEET_DEALER_MASTER        = 'DealerMaster';
+const SHEET_EVAL_PARAMETERS      = 'EvaluationParameters';
+const SHEET_CITY_CLASSIFICATION  = 'CityClassification';
+const SHEET_CLUB_CRITERIA        = 'ClubCriteria';
+const SHEET_SIMULATION_LOG       = 'SimulationLog';
 
-  <style>
-    body { background-color: #f1f5f9; font-size: 1rem; }
-    .app-shell { max-width: 960px; }
-    .top-bar { background: linear-gradient(90deg, #0f172a, #0ea5e9); color: #f9fafb; }
-    .top-bar .title { font-size: 1.25rem; font-weight: 600; }
-    .top-bar .subtitle { font-size: 0.9rem; opacity: 0.9; }
-    .section-header { margin-top: 0.75rem; margin-bottom: 0.5rem; }
-    .section-title { font-size: 1.1rem; font-weight: 600; }
-    .section-subtitle { font-size: 0.85rem; color: #6b7280; }
-    .card { border-radius: 14px; border: 1px solid #e5e7eb; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06); background-color: #fff; margin-bottom: 1.25rem; }
-    .card-body { padding: 1.15rem 1.25rem 1.25rem; }
-    .card-dealer { border-top: 4px solid #0ea5e9; }
-    .card-inputs { border-top: 4px solid #22c55e; }
-    .card-results { border-top: 4px solid #f97316; }
-    .pill-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 0.3rem; }
-    .metric-tile { border-radius: 10px; padding: 0.7rem 0.8rem; background-color: #f9fafb; border: 1px solid #e5e7eb; margin-bottom: 0.6rem; }
-    .metric-label { font-size: 0.8rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.15rem; }
-    .metric-value { font-size: 1.1rem; font-weight: 600; }
-    .badge-club { font-size: 0.9rem; padding: 0.3rem 0.7rem; border-radius: 999px; }
-    .badge-mdcouncil { background-color: #0d6efd; }
-    .badge-diamond { background-color: #0ea5e9; }
-    .badge-emerald { background-color: #16a34a; }
-    .badge-ruby { background-color: #dc2626; }
-    .badge-others { background-color: #6b7280; }
-    .table-sm th, .table-sm td { padding: 0.45rem 0.55rem; font-size: 0.9rem; }
-    label.form-label { font-size: 0.9rem; font-weight: 500; }
-
-    @media (max-width: 576px) {
-      body { font-size: 0.95rem; }
-      .card-body { padding: 1rem; }
-      .btn { width: 100%; margin-bottom: 0.5rem; }
-      .btn + .btn { margin-left: 0 !important; }
-      .app-shell { padding-left: 0.7rem; padding-right: 0.7rem; }
-      .top-bar .subtitle { display: none; }
-    }
-  </style>
-</head>
-<body>
-  <nav class="navbar top-bar mb-3">
-    <div class="container app-shell d-flex flex-column flex-sm-row align-items-sm-center py-2">
-      <div class="d-flex align-items-center">
-        <i class="bi bi-trophy-fill me-2" style="font-size: 1.4rem;"></i>
-        <div>
-          <div class="title">DIAGEM Loyalty Simulator</div>
-          <div class="subtitle">Select dealer → Enter projections → View club & payout</div>
-        </div>
-      </div>
-      <span id="globalStatus" class="ms-sm-auto mt-2 mt-sm-0 small"></span>
-    </div>
-  </nav>
-
-  <div class="container app-shell pb-4">
-    <div class="section-header">
-      <div class="section-title">1. Dealer selection</div>
-      <div class="section-subtitle">Choose branch and dealer; master data will be pulled automatically.</div>
-    </div>
-
-    <div class="card card-dealer">
-      <div class="card-body">
-        <div class="pill-label">Branch</div>
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-4">
-            <label class="form-label mb-1">Branch</label>
-            <select id="branchSelect" class="form-select form-select-md" onchange="onBranchChange()">
-              <option value="">Loading branches...</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="pill-label">Dealer</div>
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-4">
-            <label class="form-label mb-1">Dealer Code</label>
-            <input id="dealerCodeInput" type="text" class="form-control form-control-md" placeholder="Enter dealer code">
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label mb-1">Dealer Name (search)</label>
-            <input id="dealerNameSearch" type="text" class="form-control form-control-md" placeholder="Type to filter" oninput="filterDealerList()">
-          </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label mb-1">Dealer list</label>
-            <select id="dealerList" class="form-select form-select-md" onchange="onDealerSelectedFromList()">
-              <option value="">-- Select Dealer --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="d-flex flex-column flex-md-row align-items-md-center">
-          <button class="btn btn-primary me-md-2" onclick="fetchDealer()">
-            <i class="bi bi-search me-1"></i>Fetch Dealer
-          </button>
-          <span id="dealerFetchStatus" class="mt-2 mt-md-0 text-muted small"></span>
-        </div>
-
-        <hr class="my-4">
-
-        <div class="pill-label mb-2">Dealer snapshot</div>
-        <div id="dealerSnapshot">
-          <p class="text-muted mb-0">After selecting branch and dealer, click “Fetch Dealer” to view details.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header">
-      <div class="section-title">2. Simulation inputs</div>
-      <div class="section-subtitle">Enter projected CY sales/service and qualitative parameters.</div>
-    </div>
-
-    <div class="card card-inputs">
-      <div class="card-body">
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-3">
-            <label class="form-label mb-1">CY Sales (Mn)</label>
-            <input id="cySalesInput" type="number" step="0.01" class="form-control form-control-md" placeholder="e.g. 120">
-          </div>
-          <div class="col-12 col-md-3">
-            <label class="form-label mb-1">CY Service (Mn)</label>
-            <input id="cyServiceInput" type="number" step="0.01" class="form-control form-control-md" placeholder="e.g. 10">
-          </div>
-          <div class="col-6 col-md-3">
-            <label class="form-label mb-1">City Category</label>
-            <select id="cityCategoryInput" class="form-select form-select-md">
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-              <option value="E">E</option>
-            </select>
-          </div>
-          <div class="col-6 col-md-3">
-            <label class="form-label mb-1">Exclusivity</label>
-            <select id="exclusivityInput" class="form-select form-select-md">
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row g-3 mb-3">
-          <div class="col-6 col-md-3">
-            <label class="form-label mb-1">Cheque Bounce (CY)</label>
-            <select id="chequeBounceInput" class="form-select form-select-md">
-              <option value="No">No</option>
-              <option value="Yes">Yes</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="d-flex flex-column flex-md-row align-items-md-center mt-1">
-          <button class="btn btn-success me-md-2" onclick="runSimulation()">
-            <i class="bi bi-play-fill me-1"></i>Run Simulation
-          </button>
-          <button class="btn btn-outline-secondary" onclick="resetInputs()">Reset Inputs</button>
-          <span id="simulationStatus" class="ms-md-3 mt-2 mt-md-0 text-muted small"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header">
-      <div class="section-title">3. Result summary</div>
-      <div class="section-subtitle">Total DIAGEM points, club category and estimated payouts.</div>
-    </div>
-
-    <div class="card card-results" id="resultCard" style="display:none;">
-      <div class="card-body">
-        <div id="summaryPanel" class="mb-3"></div>
-
-        <details>
-          <summary class="small text-primary" style="cursor:pointer;">Show parameter-wise breakdown</summary>
-          <div class="table-responsive mt-2">
-            <table class="table table-sm table-bordered align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Parameter</th>
-                  <th>Weight</th>
-                  <th>Actual</th>
-                  <th>Rating</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody id="parameterTableBody"></tbody>
-            </table>
-          </div>
-        </details>
-
-        <div class="mt-3 d-flex flex-column flex-md-row justify-content-md-end">
-          <button class="btn btn-outline-primary" onclick="saveSimulation()">
-            <i class="bi bi-save me-1"></i>Save Simulation
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <footer class="mt-3 text-center text-muted small">DIAGEM simulation | Internal management tool</footer>
-  </div>
-
-  <script>
-    const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkmheClsupW2LyUhp7juVBt32hnsqx3_QZYsLg0h2_xKulnUtpixvw2waTsK172MMlwA/exec';
-
-    let branches = [];
-    let dealersForBranch = [];
-    let currentDealer = null;
-    let lastSimulationPayload = null;
-    let lastSimulationResult = null;
-
-    async function callApi(action, payload = {}) {
-      const body = { action, ...payload };
-      const res = await fetch(APPSCRIPT_URL + '?t=' + Date.now(), {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(body)
-      });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'API error');
-      return json.data || json;
+/**********************
+ * WEB APP ENTRY (API)
+ **********************/
+function doPost(e) {
+  try {
+    if (!e.postData || !e.postData.contents) {
+      return jsonResponse_({ success: false, error: 'Empty body' });
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const status = document.getElementById('globalStatus');
-      status.textContent = 'Loading branches...';
-      try {
-        branches = await callApi('getBranchList');
-        const sel = document.getElementById('branchSelect');
-        sel.innerHTML = '<option value="">-- Select Branch --</option>';
-        branches.forEach(b => {
-          const opt = document.createElement('option');
-          opt.value = b;
-          opt.textContent = b;
-          sel.appendChild(opt);
-        });
-        status.textContent = '';
-      } catch (e) {
-        status.textContent = 'Error';
-        alert('Error loading branches: ' + e.message);
-      }
+    const payload = JSON.parse(e.postData.contents);
+    const action = payload.action;
+
+    if (action === 'getBranchList') {
+      return jsonResponse_({ success: true, data: getBranchList() });
+    }
+
+    if (action === 'getDealersForBranch') {
+      return jsonResponse_({ success: true, data: getDealersForBranch(payload.branch) });
+    }
+
+    if (action === 'getDealerByCode') {
+      return jsonResponse_({ success: true, data: getDealerByCode(payload.branch, payload.dealerCode) });
+    }
+
+    if (action === 'calculateSimulation') {
+      return jsonResponse_({ success: true, data: calculateSimulation(payload.payload) });
+    }
+
+    if (action === 'logSimulation') {
+      logSimulation(payload.payload, payload.result);
+      return jsonResponse_({ success: true });
+    }
+
+    return jsonResponse_({ success: false, error: 'Unknown action: ' + action });
+  } catch (err) {
+    return jsonResponse_({ success: false, error: err.message });
+  }
+}
+
+function jsonResponse_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**********************
+ * DATA LOADING
+ **********************/
+function getConfig_() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+
+  const dealerSheet = ss.getSheetByName(SHEET_DEALER_MASTER);
+  const evalSheet   = ss.getSheetByName(SHEET_EVAL_PARAMETERS);
+  const citySheet   = ss.getSheetByName(SHEET_CITY_CLASSIFICATION);
+  const clubSheet   = ss.getSheetByName(SHEET_CLUB_CRITERIA);
+
+  if (!dealerSheet) throw new Error('DealerMaster sheet not found');
+  if (!evalSheet) throw new Error('EvaluationParameters sheet not found');
+  if (!citySheet) throw new Error('CityClassification sheet not found');
+  if (!clubSheet) throw new Error('ClubCriteria sheet not found');
+
+  const dealerData = dealerSheet.getDataRange().getValues();
+  const evalData   = evalSheet.getDataRange().getValues();
+  const cityData   = citySheet.getDataRange().getValues();
+  const clubData   = clubSheet.getDataRange().getValues();
+
+  return {
+    dealerMapByCode: buildDealerMap_(dealerData),
+    branches: buildBranchList_(dealerData),
+    dealersByBranch: buildDealersByBranch_(dealerData),
+    evalConfig: buildEvalConfig_(evalData),
+    clubConfig: buildClubConfig_(clubData),
+    cityCategoryMap: buildCityCategoryMap_(cityData)
+  };
+}
+
+function normalizeText_(v) {
+  return String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+}
+
+function normalizeBranch_(v) {
+  const s = normalizeText_(v);
+  if (!s) return '';
+  const key = s.toLowerCase();
+  if (key === 'ahmedabad' || key === 'ahmd' || key === 'ahemdabad') return 'Ahmedabad';
+  if (key === 'mumbai' || key === 'mum bai' || key === 'bombay') return 'Mumbai';
+  if (key === 'pune') return 'Pune';
+  if (key === 'goa' || key === 'north goa' || key === 'south goa' || key === 'no rth goa') return 'Goa';
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function normalizeDealerCode_(v) {
+  return normalizeText_(v);
+}
+
+/**********************
+ * BUILDERS
+ **********************/
+function buildDealerMap_(data) {
+  const header = data[0];
+  const idx = {
+    SNo: header.indexOf('SNo'),
+    DealerCode: header.indexOf('DealerCode'),
+    DealerName: header.indexOf('DealerName'),
+    Branch: header.indexOf('Branch'),
+    City: header.indexOf('City'),
+    CityCategory: header.indexOf('CityCategory'),
+    DateOfJoining: header.indexOf('DateOfJoining'),
+    SalesRevenue_LY_Mn: header.indexOf('SalesRevenue_LY_Mn'),
+    ServiceRevenue_LY_Mn: header.indexOf('ServiceRevenue_LY_Mn'),
+    TotalRevenue_LY_Mn: header.indexOf('TotalRevenue_LY_Mn'),
+    SalesRevenue_CY_Mn: header.indexOf('SalesRevenue_CY_Mn'),
+    ServiceRevenue_CY_Mn: header.indexOf('ServiceRevenue_CY_Mn'),
+    TotalRevenue_CY_Mn: header.indexOf('TotalRevenue_CY_Mn'),
+    Exclusivity: header.indexOf('Exclusivity'),
+    ChequeBounce: header.indexOf('ChequeBounce'),
+    Remarks: header.indexOf('Remarks')
+  };
+
+  const map = {};
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const code = normalizeDealerCode_(row[idx.DealerCode]);
+    if (!code) continue;
+
+    map[code] = {
+      sNo: row[idx.SNo],
+      dealerCode: code,
+      dealerName: normalizeText_(row[idx.DealerName]),
+      branch: normalizeBranch_(row[idx.Branch]),
+      city: normalizeText_(row[idx.City]),
+      cityCategory: normalizeText_(row[idx.CityCategory]),
+      dateOfJoining: row[idx.DateOfJoining],
+      lySales: Number(row[idx.SalesRevenue_LY_Mn] || 0),
+      lyService: Number(row[idx.ServiceRevenue_LY_Mn] || 0),
+      lyTotal: Number(row[idx.TotalRevenue_LY_Mn] || 0),
+      cySales: Number(row[idx.SalesRevenue_CY_Mn] || 0),
+      cyService: Number(row[idx.ServiceRevenue_CY_Mn] || 0),
+      cyTotal: Number(row[idx.TotalRevenue_CY_Mn] || 0),
+      exclusivity: normalizeText_(row[idx.Exclusivity]),
+      chequeBounce: normalizeText_(row[idx.ChequeBounce]),
+      remarks: row[idx.Remarks]
+    };
+  }
+  return map;
+}
+
+function buildBranchList_(data) {
+  const header = data[0];
+  const branchIndex = header.indexOf('Branch');
+  const branchesSet = new Set();
+
+  for (let i = 1; i < data.length; i++) {
+    const b = normalizeBranch_(data[i][branchIndex]);
+    if (b) branchesSet.add(b);
+  }
+  return Array.from(branchesSet).sort();
+}
+
+function buildDealersByBranch_(data) {
+  const header = data[0];
+  const idxBranch = header.indexOf('Branch');
+  const idxCode = header.indexOf('DealerCode');
+  const idxName = header.indexOf('DealerName');
+
+  const map = {};
+  for (let i = 1; i < data.length; i++) {
+    const branch = normalizeBranch_(data[i][idxBranch]);
+    const code = normalizeDealerCode_(data[i][idxCode]);
+    const name = normalizeText_(data[i][idxName]);
+    if (!branch || !code) continue;
+
+    if (!map[branch]) map[branch] = [];
+    map[branch].push({ dealerCode: code, dealerName: name });
+  }
+
+  Object.keys(map).forEach(b => {
+    map[b].sort((a, b) => a.dealerName.localeCompare(b.dealerName));
+  });
+
+  return map;
+}
+
+function buildEvalConfig_(data) {
+  const header = data[0];
+
+  function idxOf(names) {
+    for (let n of names) {
+      const i = header.indexOf(n);
+      if (i !== -1) return i;
+    }
+    return -1;
+  }
+
+  const idx = {
+    Parameter: idxOf(['Parameter']),
+    UnitOfMeasure: idxOf(['UnitOfMeasure', 'Unit Of Measure']),
+    Weight: idxOf(['Weight']),
+    A025: idxOf(['A025Threshold', 'A0.25Threshold', 'A_0_25_Threshold']),
+    A050: idxOf(['A050Threshold', 'A0.50Threshold', 'A_0_50_Threshold']),
+    A075: idxOf(['A075Threshold', 'A0.75Threshold', 'A_0_75_Threshold']),
+    A100: idxOf(['A100Threshold', 'A1.00Threshold', 'A_1_00_Threshold']),
+    B025: idxOf(['B025Threshold', 'B0.25Threshold', 'B_0_25_Threshold']),
+    B050: idxOf(['B050Threshold', 'B0.50Threshold', 'B_0_50_Threshold']),
+    B075: idxOf(['B075Threshold', 'B0.75Threshold', 'B_0_75_Threshold']),
+    B100: idxOf(['B100Threshold', 'B1.00Threshold', 'B_1_00_Threshold']),
+    C025: idxOf(['C025Threshold', 'C0.25Threshold', 'C_0_25_Threshold']),
+    C050: idxOf(['C050Threshold', 'C0.50Threshold', 'C_0_50_Threshold']),
+    C075: idxOf(['C075Threshold', 'C0.75Threshold', 'C_0_75_Threshold']),
+    C100: idxOf(['C100Threshold', 'C1.00Threshold', 'C_1_00_Threshold']),
+    D025: idxOf(['D025Threshold', 'D0.25Threshold', 'D_0_25_Threshold']),
+    D050: idxOf(['D050Threshold', 'D0.50Threshold', 'D_0_50_Threshold']),
+    D075: idxOf(['D075Threshold', 'D0.75Threshold', 'D_0_75_Threshold']),
+    D100: idxOf(['D100Threshold', 'D1.00Threshold', 'D_1_00_Threshold']),
+    E025: idxOf(['E025Threshold', 'E0.25Threshold', 'E_0_25_Threshold']),
+    E050: idxOf(['E050Threshold', 'E0.50Threshold', 'E_0_50_Threshold']),
+    E075: idxOf(['E075Threshold', 'E0.75Threshold', 'E_0_75_Threshold']),
+    E100: idxOf(['E100Threshold', 'E1.00Threshold', 'E_1_00_Threshold']),
+    YesRating: idxOf(['YesRating', 'Yes Rating']),
+    NoRating: idxOf(['NoRating', 'No Rating'])
+  };
+
+  const cfg = {};
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const param = normalizeText_(row[idx.Parameter]);
+    if (!param) continue;
+
+    const weight = Number(row[idx.Weight] || 0);
+
+    function valOrNull(index) {
+      if (index < 0) return null;
+      const v = row[index];
+      return v === '' || v == null ? null : Number(v);
+    }
+
+    let yesRating = valOrNull(idx.YesRating);
+    let noRating = valOrNull(idx.NoRating);
+
+    if (param === 'Exclusivity') {
+      yesRating = 1;
+      noRating = 0;
+    } else if (param === 'ChequeBounce') {
+      yesRating = 0;
+      noRating = 1;
+    }
+
+    cfg[param] = {
+      parameter: param,
+      unit: idx.UnitOfMeasure >= 0 ? row[idx.UnitOfMeasure] : '',
+      weight: weight,
+      thresholds: {
+        A: { t025: valOrNull(idx.A025), t050: valOrNull(idx.A050), t075: valOrNull(idx.A075), t100: valOrNull(idx.A100) },
+        B: { t025: valOrNull(idx.B025), t050: valOrNull(idx.B050), t075: valOrNull(idx.B075), t100: valOrNull(idx.B100) },
+        C: { t025: valOrNull(idx.C025), t050: valOrNull(idx.C050), t075: valOrNull(idx.C075), t100: valOrNull(idx.C100) },
+        D: { t025: valOrNull(idx.D025), t050: valOrNull(idx.D050), t075: valOrNull(idx.D075), t100: valOrNull(idx.D100) },
+        E: { t025: valOrNull(idx.E025), t050: valOrNull(idx.E050), t075: valOrNull(idx.E075), t100: valOrNull(idx.E100) }
+      },
+      yesRating: yesRating,
+      noRating: noRating
+    };
+  }
+
+  return cfg;
+}
+
+function buildCityCategoryMap_(data) {
+  const header = data[0];
+  const idxCity = header.indexOf('City');
+  const idxCat = header.indexOf('CityCategory');
+  const map = {};
+
+  for (let i = 1; i < data.length; i++) {
+    const city = normalizeText_(data[i][idxCity]);
+    const cat = normalizeText_(data[i][idxCat]);
+    if (!city || !cat) continue;
+    map[city.toLowerCase()] = cat;
+  }
+  return map;
+}
+
+function buildClubConfig_(data) {
+  const header = data[0];
+  const idx = {
+    ClubName: header.indexOf('ClubName'),
+    MinPoints: header.indexOf('MinPoints'),
+    MaxPoints: header.indexOf('MaxPoints'),
+    DiagemBonusPercent: header.indexOf('DiagemBonusPercent'),
+    RecognitionPercent: header.indexOf('RecognitionPercent')
+  };
+
+  const arr = [];
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const name = normalizeText_(row[idx.ClubName]);
+    if (!name) continue;
+    arr.push({
+      clubName: name,
+      minPoints: Number(row[idx.MinPoints] || 0),
+      maxPoints: row[idx.MaxPoints] !== '' ? Number(row[idx.MaxPoints]) : 999,
+      bonusPercent: Number(row[idx.DiagemBonusPercent] || 0),
+      recognitionPercent: Number(row[idx.RecognitionPercent] || 0)
     });
+  }
+  arr.sort((a, b) => b.minPoints - a.minPoints);
+  return arr;
+}
 
-    async function onBranchChange() {
-      const branch = document.getElementById('branchSelect').value;
-      currentDealer = null;
-      dealersForBranch = [];
-      document.getElementById('dealerCodeInput').value = '';
-      document.getElementById('dealerNameSearch').value = '';
-      document.getElementById('dealerList').innerHTML = '<option value="">-- Select Dealer --</option>';
-      document.getElementById('dealerSnapshot').innerHTML = '<p class="text-muted mb-0">After selecting branch and dealer, click “Fetch Dealer” to view details.</p>';
-      document.getElementById('resultCard').style.display = 'none';
-      if (!branch) return;
+/**********************
+ * PUBLIC API
+ **********************/
+function getBranchList() {
+  return getConfig_().branches;
+}
 
-      try {
-        dealersForBranch = await callApi('getDealersForBranch', { branch });
-        populateDealerList(dealersForBranch);
-      } catch (e) {
-        alert('Error loading dealers: ' + e.message);
-      }
-    }
+function getDealersForBranch(branch) {
+  const cfg = getConfig_();
+  const key = normalizeBranch_(branch);
+  return cfg.dealersByBranch[key] || [];
+}
 
-    function populateDealerList(list) {
-      const sel = document.getElementById('dealerList');
-      sel.innerHTML = '<option value="">-- Select Dealer --</option>';
-      list.forEach(d => {
-        const opt = document.createElement('option');
-        opt.value = d.dealerCode;
-        opt.textContent = `${d.dealerName} (${d.dealerCode})`;
-        sel.appendChild(opt);
-      });
-    }
+function getDealerByCode(branch, dealerCode) {
+  const cfg = getConfig_();
+  const code = normalizeDealerCode_(dealerCode);
+  const dealer = cfg.dealerMapByCode[code];
+  if (!dealer) throw new Error('Dealer not found: ' + dealerCode);
 
-    function filterDealerList() {
-      const term = document.getElementById('dealerNameSearch').value.toLowerCase();
-      if (!term) {
-        populateDealerList(dealersForBranch);
-        return;
-      }
-      const filtered = dealersForBranch.filter(d =>
-        d.dealerName.toLowerCase().includes(term) || d.dealerCode.toLowerCase().includes(term)
-      );
-      populateDealerList(filtered);
-    }
+  if (branch && normalizeBranch_(dealer.branch) !== normalizeBranch_(branch)) {
+    throw new Error('Dealer does not belong to selected branch.');
+  }
 
-    function onDealerSelectedFromList() {
-      const code = document.getElementById('dealerList').value;
-      if (code) document.getElementById('dealerCodeInput').value = code;
-    }
+  const years = calculateYears_(dealer.dateOfJoining);
 
-    async function fetchDealer() {
-      const branch = document.getElementById('branchSelect').value;
-      const code = document.getElementById('dealerCodeInput').value.trim();
+  return {
+    dealerCode: dealer.dealerCode,
+    dealerName: dealer.dealerName,
+    branch: dealer.branch,
+    city: dealer.city,
+    cityCategory: dealer.cityCategory,
+    dateOfJoining: dealer.dateOfJoining,
+    yearsOfAssociation: years,
+    lySales: dealer.lySales,
+    lyService: dealer.lyService,
+    lyTotal: dealer.lyTotal,
+    defaultExclusivity: dealer.exclusivity
+  };
+}
 
-      if (!branch) return alert('Please select a branch first.');
-      if (!code) return alert('Please enter dealer code or select from list.');
+function calculateSimulation(payload) {
+  const cfg = getConfig_();
+  const evalCfg = cfg.evalConfig;
+  const clubCfg = cfg.clubConfig;
 
-      const status = document.getElementById('dealerFetchStatus');
-      status.textContent = 'Loading...';
+  const cityCategory = normalizeText_(payload.cityCategory) || 'E';
+  const lySales = Number(payload.lySales || 0);
+  const lyService = Number(payload.lyService || 0);
+  const cySales = Number(payload.cySales || 0);
+  const cyService = Number(payload.cyService || 0);
+  const yearsAssoc = Number(payload.yearsOfAssociation || 0);
+  const exclusivity = normalizeText_(payload.exclusivity);
+  const chequeBounce = normalizeText_(payload.chequeBounce);
 
-      try {
-        const dealer = await callApi('getDealerByCode', { branch, dealerCode: code });
-        currentDealer = dealer;
-        status.textContent = 'Loaded';
-        renderDealerSnapshot(dealer);
-        document.getElementById('cityCategoryInput').value = dealer.cityCategory || 'E';
-        document.getElementById('exclusivityInput').value = dealer.defaultExclusivity || 'No';
-        document.getElementById('chequeBounceInput').value = 'No';
-        document.getElementById('cySalesInput').value = '';
-        document.getElementById('cyServiceInput').value = '';
-      } catch (e) {
-        currentDealer = null;
-        status.textContent = 'Error';
-        alert('Error fetching dealer: ' + e.message);
-      }
-    }
+  const totalCyTurnover = cySales + cyService;
+  const salesGrowth = lySales > 0 ? cySales / lySales : 0;
+  const serviceGrowth = lyService > 0 ? cyService / lyService : 0;
 
-    function renderDealerSnapshot(dealer) {
-      document.getElementById('dealerSnapshot').innerHTML = `
-        <div class="row mb-2"><div class="col-md-4"><strong>Code:</strong> ${dealer.dealerCode}</div><div class="col-md-4"><strong>Name:</strong> ${dealer.dealerName}</div><div class="col-md-4"><strong>Branch:</strong> ${dealer.branch}</div></div>
-        <div class="row mb-2"><div class="col-md-4"><strong>City:</strong> ${dealer.city}</div><div class="col-md-4"><strong>City Cat:</strong> ${dealer.cityCategory}</div><div class="col-md-4"><strong>DOJ:</strong> ${formatDate(dealer.dateOfJoining)}</div></div>
-        <div class="row mb-2"><div class="col-md-4"><strong>Years:</strong> ${dealer.yearsOfAssociation}</div><div class="col-md-4"><strong>LY Sales (Mn):</strong> ${dealer.lySales}</div><div class="col-md-4"><strong>LY Service (Mn):</strong> ${dealer.lyService}</div></div>
-        <div class="row"><div class="col-md-4"><strong>LY Total (Mn):</strong> ${dealer.lyTotal}</div><div class="col-md-4"><strong>Default Exclusivity:</strong> ${dealer.defaultExclusivity}</div></div>
-      `;
-    }
+  const results = [];
+  results.push(rateNumericParam_(evalCfg['SalesRevenue'], cityCategory, cySales, 'Sales Revenue (CY)'));
+  results.push(rateNumericParam_(evalCfg['SalesGrowth'], cityCategory, salesGrowth, 'Sales Growth (CY vs LY)'));
+  results.push(rateNumericParam_(evalCfg['ServiceRevenue'], cityCategory, cyService, 'Service Revenue (CY)'));
+  results.push(rateNumericParam_(evalCfg['ServiceGrowth'], cityCategory, serviceGrowth, 'Service Growth (CY vs LY)'));
+  results.push(rateNumericParam_(evalCfg['YearsOfAssociation'], cityCategory, yearsAssoc, 'Years of Association'));
+  results.push(rateYesNoParam_(evalCfg['Exclusivity'], exclusivity, 'Exclusivity'));
 
-    function formatDate(val) {
-      if (!val) return '';
-      const d = new Date(val);
-      if (isNaN(d.getTime())) return val;
-      const dd = String(d.getDate()).padStart(2, '0');
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const yyyy = d.getFullYear();
-      return `${dd}-${mm}-${yyyy}`;
-    }
+  const chequeCfg = evalCfg['ChequeBounce'];
+  if (!chequeCfg) throw new Error('Eval config missing for ChequeBounce.');
+  results.push(rateYesNoParam_(chequeCfg, chequeBounce, 'Cheque Bounce (current year)'));
 
-    function resetInputs() {
-      document.getElementById('cySalesInput').value = '';
-      document.getElementById('cyServiceInput').value = '';
-      document.getElementById('chequeBounceInput').value = 'No';
-      if (currentDealer) {
-        document.getElementById('cityCategoryInput').value = currentDealer.cityCategory || 'E';
-        document.getElementById('exclusivityInput').value = currentDealer.defaultExclusivity || 'No';
-      } else {
-        document.getElementById('cityCategoryInput').value = 'E';
-        document.getElementById('exclusivityInput').value = 'No';
-      }
-      document.getElementById('simulationStatus').textContent = '';
-      document.getElementById('resultCard').style.display = 'none';
-    }
+  let totalPoints = 0;
+  results.forEach(r => totalPoints += r.score);
 
-    async function runSimulation() {
-      if (!currentDealer) return alert('Please fetch a dealer first.');
+  const club = findClubForPoints_(clubCfg, totalPoints);
+  const bonusAmount = totalCyTurnover * (club.bonusPercent / 100);
+  const recognitionAmount = totalCyTurnover * (club.recognitionPercent / 100);
 
-      const cySales = parseFloat(document.getElementById('cySalesInput').value || '0');
-      const cyService = parseFloat(document.getElementById('cyServiceInput').value || '0');
-      const cityCat = document.getElementById('cityCategoryInput').value;
-      const exclusivity = document.getElementById('exclusivityInput').value;
-      const cheque = document.getElementById('chequeBounceInput').value;
+  return {
+    dealerCode: payload.dealerCode,
+    dealerName: payload.dealerName || '',
+    branch: normalizeBranch_(payload.branch),
+    city: payload.city || '',
+    cityCategory: cityCategory,
+    cySales: cySales,
+    cyService: cyService,
+    totalCyTurnover: totalCyTurnover,
+    yearsOfAssociation: yearsAssoc,
+    exclusivity: exclusivity,
+    chequeBounce: chequeBounce,
+    parameters: results,
+    totalPoints: totalPoints,
+    clubName: club.clubName,
+    bonusPercent: club.bonusPercent,
+    bonusAmount: bonusAmount,
+    recognitionPercent: club.recognitionPercent,
+    recognitionAmount: recognitionAmount,
+    lySales: lySales,
+    lyService: lyService
+  };
+}
 
-      if (cySales <= 0 && cyService <= 0) return alert('Please enter CY Sales and/or Service.');
+function logSimulation(payload, result) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(SHEET_SIMULATION_LOG);
+  if (!sheet) throw new Error('SimulationLog sheet not found.');
 
-      const payload = {
-        dealerCode: currentDealer.dealerCode,
-        dealerName: currentDealer.dealerName,
-        branch: currentDealer.branch,
-        city: currentDealer.city,
-        lySales: currentDealer.lySales,
-        lyService: currentDealer.lyService,
-        yearsOfAssociation: currentDealer.yearsOfAssociation,
-        cityCategory: cityCat,
-        cySales,
-        cyService,
-        exclusivity,
-        chequeBounce: cheque
-      };
+  const email = (Session.getActiveUser && Session.getActiveUser().getEmail()) || '';
+  const p = result.parameters || [];
+  const getParam = (index) => p[index] || { rating: '', score: '' };
 
-      const status = document.getElementById('simulationStatus');
-      status.textContent = 'Running...';
+  const row = [
+    new Date(),
+    email,
+    result.branch,
+    result.dealerCode,
+    result.dealerName,
+    result.city,
+    result.cityCategory,
+    result.yearsOfAssociation,
+    result.lySales,
+    result.lyService,
+    result.cySales,
+    result.cyService,
+    result.totalCyTurnover,
+    result.exclusivity,
+    result.chequeBounce,
+    result.totalPoints,
+    result.clubName,
+    result.bonusPercent,
+    result.bonusAmount,
+    result.recognitionPercent,
+    result.recognitionAmount,
+    getParam(0).rating, getParam(0).score,
+    getParam(1).rating, getParam(1).score,
+    getParam(2).rating, getParam(2).score,
+    getParam(3).rating, getParam(3).score,
+    getParam(4).rating, getParam(4).score,
+    getParam(5).rating, getParam(5).score,
+    getParam(6).rating, getParam(6).score
+  ];
 
-      try {
-        const result = await callApi('calculateSimulation', { payload });
-        lastSimulationPayload = payload;
-        lastSimulationResult = result;
-        status.textContent = 'Done';
-        renderSimulationResult(result);
-      } catch (e) {
-        status.textContent = 'Error';
-        alert('Error in simulation: ' + e.message);
-      }
-    }
+  sheet.appendRow(row);
+}
 
-    function renderSimulationResult(result) {
-      const resultCard = document.getElementById('resultCard');
-      const summaryDiv = document.getElementById('summaryPanel');
-      const tbody = document.getElementById('parameterTableBody');
+/**********************
+ * RATING HELPERS
+ **********************/
+function rateNumericParam_(paramCfg, cityCategory, value, label) {
+  if (!paramCfg) throw new Error('Eval config missing for ' + label);
 
-      const club = (result.clubName || '').toLowerCase();
-      let badgeClass = 'badge-others';
-      if (club.includes('md')) badgeClass = 'badge-mdcouncil';
-      else if (club.includes('diamond')) badgeClass = 'badge-diamond';
-      else if (club.includes('emerald')) badgeClass = 'badge-emerald';
-      else if (club.includes('ruby')) badgeClass = 'badge-ruby';
+  const weight = paramCfg.weight || 0;
+  const th = paramCfg.thresholds[cityCategory] || paramCfg.thresholds.E;
 
-      summaryDiv.innerHTML = `
-        <div class="row g-3 mb-3">
-          <div class="col-12 col-md-4"><div class="metric-tile"><div class="metric-label">Total Points</div><div class="metric-value">${result.totalPoints.toFixed(2)}</div></div></div>
-          <div class="col-12 col-md-4"><div class="metric-tile"><div class="metric-label">Club</div><div class="metric-value"><span class="badge text-white ${badgeClass}">${result.clubName}</span></div></div></div>
-          <div class="col-12 col-md-4"><div class="metric-tile"><div class="metric-label">CY Turnover (Mn)</div><div class="metric-value">${result.totalCyTurnover.toFixed(2)}</div></div></div>
-        </div>
-        <div class="row g-3">
-          <div class="col-6 col-md-3"><div class="metric-tile"><div class="metric-label">Bonus %</div><div class="metric-value">${result.bonusPercent}%</div></div></div>
-          <div class="col-6 col-md-3"><div class="metric-tile"><div class="metric-label">Bonus (Mn)</div><div class="metric-value">${result.bonusAmount.toFixed(2)}</div></div></div>
-          <div class="col-6 col-md-3"><div class="metric-tile"><div class="metric-label">Recognition %</div><div class="metric-value">${result.recognitionPercent}%</div></div></div>
-          <div class="col-6 col-md-3"><div class="metric-tile"><div class="metric-label">Recognition (Mn)</div><div class="metric-value">${result.recognitionAmount.toFixed(2)}</div></div></div>
-        </div>
-      `;
+  let rating = 0;
+  if (th && th.t025 != null && th.t050 != null && th.t075 != null && th.t100 != null) {
+    const v = Number(value || 0);
+    if (v >= th.t100) rating = 1;
+    else if (v >= th.t075) rating = 0.75;
+    else if (v >= th.t050) rating = 0.5;
+    else if (v >= th.t025) rating = 0.25;
+    else rating = 0;
+  }
 
-      tbody.innerHTML = '';
-      (result.parameters || []).forEach(p => {
-        const tr = document.createElement('tr');
-        const valText = typeof p.value === 'number' ? p.value.toFixed(2) : p.value;
-        tr.innerHTML = `<td>${p.parameter}</td><td>${p.weight}</td><td>${valText}</td><td>${p.rating}</td><td>${p.score.toFixed(2)}</td>`;
-        tbody.appendChild(tr);
-      });
+  return {
+    parameter: label,
+    baseParameter: paramCfg.parameter,
+    weight: weight,
+    value: value,
+    rating: rating,
+    score: weight * rating
+  };
+}
 
-      resultCard.style.display = 'block';
-    }
+function rateYesNoParam_(paramCfg, yesNoValue, label) {
+  if (!paramCfg) throw new Error('Eval config missing for ' + label);
 
-    async function saveSimulation() {
-      if (!lastSimulationPayload || !lastSimulationResult) return alert('Run a simulation first before saving.');
-      try {
-        await callApi('logSimulation', { payload: lastSimulationPayload, result: lastSimulationResult });
-        alert('Simulation saved to log.');
-      } catch (e) {
-        alert('Error saving simulation: ' + e.message);
-      }
-    }
-  </script>
-</body>
-</html>
+  const weight = paramCfg.weight || 0;
+  const yesRating = paramCfg.yesRating != null ? paramCfg.yesRating : 0;
+  const noRating = paramCfg.noRating != null ? paramCfg.noRating : 0;
+  const v = String(yesNoValue || '').toLowerCase();
+  const rating = (v === 'yes') ? yesRating : noRating;
+
+  return {
+    parameter: label,
+    baseParameter: paramCfg.parameter,
+    weight: weight,
+    value: yesNoValue,
+    rating: rating,
+    score: weight * rating
+  };
+}
+
+function findClubForPoints_(clubCfg, totalPoints) {
+  for (let i = 0; i < clubCfg.length; i++) {
+    const c = clubCfg[i];
+    if (totalPoints >= c.minPoints && totalPoints <= c.maxPoints) return c;
+  }
+  return clubCfg[clubCfg.length - 1];
+}
+
+/**********************
+ * UTILS
+ **********************/
+function calculateYears_(dateValue) {
+  if (!dateValue) return 0;
+  const joinDate = new Date(dateValue);
+  const now = new Date();
+  let years = now.getFullYear() - joinDate.getFullYear();
+  const m = now.getMonth() - joinDate.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < joinDate.getDate())) years--;
+  return years;
+}
